@@ -1,0 +1,51 @@
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.naive_bayes import CategoricalNB
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# Create dataset
+data = {
+    'Outlook': ['Rainy','Rainy','Overcast','Sunny','Sunny','Sunny','Overcast',
+                'Rainy','Rainy','Sunny','Rainy','Overcast','Overcast','Sunny'],
+    'Temperature': ['Hot','Hot','Hot','Mild','Cool','Cool','Cool',
+                    'Mild','Cool','Mild','Mild','Mild','Hot','Mild'],
+    'Humidity': ['High','High','High','High','Normal','Normal','Normal',
+                 'High','Normal','Normal','Normal','High','Normal','High'],
+    'Windy': [False,True,False,False,False,True,True,
+              False,False,False,True,True,False,True],
+    'PlayGolf': ['Yes','No','Yes','No','Yes','No','Yes',
+                 'No','Yes','Yes','Yes','Yes','Yes','No']
+}
+
+df = pd.DataFrame(data)
+prior_yes = len(df[df['PlayGolf']=='Yes']) / len(df)
+prior_no = len(df[df['PlayGolf']=='No']) / len(df)
+
+print("Prior Yes:", prior_yes)
+print("Prior No:", prior_no)
+le = LabelEncoder()
+for column in df.columns:
+    df[column] = le.fit_transform(df[column])
+
+# Split features and target
+X = df.drop('PlayGolf', axis=1)
+y = df['PlayGolf']
+
+# Train Naive Bayes model
+model = CategoricalNB()
+model.fit(X, y)
+
+# Make predictions
+predictions = model.predict(X)
+
+# Accuracy
+print("Accuracy:", accuracy_score(y, predictions))
+
+
+sample = pd.DataFrame(
+    [[2, 0, 0, 1]],
+    columns=['Outlook', 'Temperature', 'Humidity', 'Windy'])
+
+
+print("Prediction for sample:", model.predict(sample))
